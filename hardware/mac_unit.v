@@ -1,4 +1,4 @@
-module mac_unit #(
+module mac_unit #(// move any to local param?
     parameter DATA_WIDTH = 8,
     parameter SUM_WIDTH  = 32
 ) (

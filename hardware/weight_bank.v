@@ -1,4 +1,4 @@
-module weight_bank #(
+module weight_bank #( // move any to local param?
     parameter NUM_INPUTS  = 784,
     parameter NUM_BATCHES = 4,
     parameter NUM_WEIGHTS = NUM_INPUTS * NUM_BATCHES,
@@ -8,7 +8,6 @@ module weight_bank #(
     parameter WEIGHT_FILE = "weights.mem"
 ) (
     input clk,
-    input rst,
     input [ADDR_WIDTH-1:0] read_addr,
     output reg signed [DATA_WIDTH-1:0] data_out
 );
