@@ -18,15 +18,16 @@ module neuron_batch #(  // move any of these to localparam?
     output reg out_valid
 );
     // States
+    reg [1:0] state;
     localparam IDLE = 2'b00;
     localparam WORKING = 2'b01;
     localparam DONE = 2'b10;
 
     // Local params
     localparam ADDR_WIDTH = $clog2(NUM_INPUTS * NUM_BATCHES);  // how does sizing of this owrk?
-    localparam [DATA_WIDTH-1:0] MAX_QUANTIZED_VALUE = {1'b0, {FRAC_BITS{1'b1}}};
+    localparam [DATA_WIDTH-1:0] MAX_QUANTIZED_VALUE = {1'b0, {(DATA_WIDTH - 1) {1'b1}}};
     localparam [DATA_WIDTH-1:0] MIN_QUANTIZED_VALUE = {
-        1'b1, {FRAC_BITS{1'b1}}
+        1'b1, {(DATA_WIDTH - 1) {1'b0}}
     };  // TODO fill with zeros not ones
 
     // Internal registers and wires
@@ -37,7 +38,7 @@ module neuron_batch #(  // move any of these to localparam?
     reg mac_rst;
     reg mac_en;
     reg [$clog2(NUM_INPUTS)-1:0] input_counter;
-    reg [DATA_WIDTH-1:0] in_delayed;
+    reg signed [DATA_WIDTH-1:0] in_delayed;
     reg in_delayed_valid;
 
     // combinational logic
@@ -46,6 +47,19 @@ module neuron_batch #(  // move any of these to localparam?
     wire signed [SUM_WIDTH-1:0] clamped = (shifted > MAX_QUANTIZED_VALUE) ? MAX_QUANTIZED_VALUE:
     (shifted < MIN_QUANTIZED_VALUE) ? MIN_QUANTIZED_VALUE: 
     shifted;
+
+    // task
+    task reset_state;
+        begin
+            out <= 0;
+            out_valid <= 0;
+            mac_rst <= 1;
+            mac_en <= 0;
+            input_counter <= 0;
+            in_delayed_valid <= 0;
+            state <= IDLE;
+        end
+    endtask
 
     // Modules
     weight_bank #(
@@ -77,29 +91,16 @@ module neuron_batch #(  // move any of these to localparam?
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            out <= 0;
-            out_valid <= 0;
-            // need to rst mem addr?
-            mac_rst <= 1;
-            mac_en <= 0;
-            input_counter <= 0;
-            in_delayed_valid <= 0;
-            state <= IDLE;
+            reset_state;
         end else begin
             case (state)
                 IDLE: begin
                     if (start) begin
                         mac_rst <= 1;
-                        state   <= WORKING;
+                        mem_addr <= batch_idx * NUM_INPUTS;
+                        state <= WORKING;
                     end else begin
-                        out <= 0;
-                        out_valid <= 0;
-                        // need to rst mem addr?
-                        mac_rst <= 1;
-                        mac_en <= 0;
-                        input_counter <= 0;
-                        in_delayed_valid <= 0;
-                        state <= IDLE;
+                        reset_state;
                     end
                 end
 
@@ -110,11 +111,11 @@ module neuron_batch #(  // move any of these to localparam?
                         mac_en <= 1;
 
                         if (input_counter == NUM_INPUTS - 1) begin
-                            mem_addr <= batch_idx * NUM_INPUTS + input_counter;
+                            mem_addr <= batch_idx * NUM_INPUTS + input_counter;  // remove?
                             input_counter <= 0;
                             state <= DONE;
                         end else begin
-                            mem_addr <= batch_idx * NUM_INPUTS + input_counter;
+                            mem_addr <= mem_addr + 1;
                             input_counter <= input_counter + 1;  // do this now or at the end?
                             state <= WORKING;
                         end
@@ -125,21 +126,14 @@ module neuron_batch #(  // move any of these to localparam?
                 end
 
                 DONE: begin
-                    out <= clamped[DATA_WIDTH-1:0]; // how does this work
+                    out <= clamped[DATA_WIDTH-1:0];
                     out_valid <= 1;
-                    in_delayed_valid <= 0;
                     state <= IDLE;
 
                 end
 
                 default: begin
-                    out <= 0;
-                    out_valid <= 0;
-                    // need to rst mem addr?
-                    mac_rst <= 1;
-                    mac_en <= 0;
-                    input_counter <= 0;
-                    state <= IDLE;
+                    reset_state;
                 end
             endcase
         end
