@@ -1,9 +1,14 @@
 *
+
 !*/
 !**/
+
+cocotb-practice/
+
 .ipynb_checkpoints/
 **/.ipynb_checkpoints/
 !.gitignore
 !*.py
 !*.ipynb
 !*.v
+plan
