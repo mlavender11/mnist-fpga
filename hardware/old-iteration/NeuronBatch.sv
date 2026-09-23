@@ -1,5 +1,5 @@
-`include "MacUnit.v"
-`include "WeightBank.v"
+`include "MacUnit.sv"
+`include "WeightBank.sv"
 
 module NeuronBatch #(  // move any of these to localparam?
     parameter NUM_INPUTS  = 784,
