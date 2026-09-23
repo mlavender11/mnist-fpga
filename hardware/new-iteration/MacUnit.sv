@@ -10,6 +10,8 @@ module MacUnit #(  // move any to local param?
     input signed [DATA_WIDTH-1:0] b_i,
     output reg signed [SUM_WIDTH-1:0] sum_o
 );
+
+    // If en_i, then update sum_o by adding a * b every clk cycle
     always @(posedge clk_i or posedge rst_i) begin
         if (rst_i) begin
             sum_o <= 0;
