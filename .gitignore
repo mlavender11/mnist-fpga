@@ -12,3 +12,4 @@ cocotb-practice/
 !*.ipynb
 !*.v
 plan
+!*.sv
