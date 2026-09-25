@@ -10,7 +10,7 @@ module WeightMem #(
     input logic clk_i,
     input logic rst_i,
 
-    input logic [$clog2(NUM_STACKS)-1:0] stack_num_i,  // Input to select which stack
+    input logic [ $clog2(NUM_STACKS)-1:0] stack_num_i,  // Input to select which stack
     input logic [$clog2(NUM_WEIGHTS)-1:0] weight_num_i, // Input to select which weight
 
     output logic [STACK_SIZE-1:0][WEIGHT_WIDTH-1:0] data_o // Output containing STACK_SIZE weights corresponding to weight_num and stack_num
