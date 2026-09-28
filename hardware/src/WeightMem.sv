@@ -7,8 +7,8 @@ module WeightMem #(
     parameter WEIGHT_FILE = "weights.mem"
 
 ) (
-    input logic clk_i,
-    input logic rst_i,
+    input logic clk,
+    input logic rst,
 
     input logic [ $clog2(NUM_STACKS)-1:0] stack_num_i,  // Input to select which stack
     input logic [$clog2(NUM_WEIGHTS)-1:0] weight_num_i, // Input to select which weight
@@ -26,7 +26,7 @@ module WeightMem #(
         $readmemh(WEIGHT_FILE, weights);
     end
 
-    always_ff @(posedge clk_i) begin
+    always_ff @(posedge clk) begin
         data_o <= weights[stack_num_i][weight_num_i];
     end
 

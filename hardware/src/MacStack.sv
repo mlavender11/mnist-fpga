@@ -6,8 +6,8 @@ module MacStack #(
     parameter SUM_WIDTH  = 32   // Width of MAC output sum
 
 ) (
-    input logic clk_i,
-    input logic rst_i,
+    input logic clk,
+    input logic rst,
     input logic clr_i,
     input logic en_i,
     input signed [DATA_WIDTH-1:0] data_i,  // input data (ex. 784 MNIST inputs, passed sequentially)
@@ -21,8 +21,8 @@ module MacStack #(
             .DATA_WIDTH(DATA_WIDTH),
             .SUM_WIDTH (SUM_WIDTH)
         ) mac_inst (
-            .clk_i,
-            .rst_i,
+            .clk,
+            .rst,
             .clr_i,
             .en_i,
             .a_i  (data_i),

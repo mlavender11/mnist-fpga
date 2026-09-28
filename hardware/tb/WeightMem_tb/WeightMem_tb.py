@@ -15,14 +15,14 @@ NUM_STACKS = 4
 @cocotb.test()
 async def memory_test(dut):
     log = logging.getLogger("cocotb.my_tb")
-    clock = Clock(dut.clk_i, 10, unit="ns")
+    clock = Clock(dut.clk, 10, unit="ns")
     clock.start()
 
     # initial inputs
     log.info("init inputs")
     dut.stack_num_i.value = 0
     dut.weight_num_i.value = 0
-    await RisingEdge(dut.clk_i)
+    await RisingEdge(dut.clk)
 
     log.info("starting memory read")
     stack_idx = 0
@@ -38,8 +38,8 @@ async def memory_test(dut):
         dut.stack_num_i.value = stack_idx
         dut.weight_num_i.value = weight_idx
 
-        await RisingEdge(dut.clk_i)
-        await RisingEdge(dut.clk_i)
+        await RisingEdge(dut.clk)
+        await RisingEdge(dut.clk)
         # await ReadOnly()  # TODO how does this work
 
         hardware_output = str(dut.data_o.value)
