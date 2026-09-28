@@ -2,8 +2,8 @@ module MacUnit #(  // move any to local param?
     parameter DATA_WIDTH = 8,  // Width of both inputs
     parameter SUM_WIDTH  = 32
 ) (
-    input clk_i,
-    input rst_i,
+    input clk,
+    input rst,
     input clr_i,
     input en_i,
     input signed [DATA_WIDTH-1:0] a_i,
@@ -12,8 +12,8 @@ module MacUnit #(  // move any to local param?
 );
 
     // If en_i, then update sum_o by adding a * b every clk cycle
-    always @(posedge clk_i or posedge rst_i) begin
-        if (rst_i) begin
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
             sum_o <= 0;
         end else if (clr_i) begin
             sum_o <= 0;
